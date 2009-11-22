@@ -7,6 +7,11 @@ hey emacs, show me an -*- mode: outline -*-
 Stack overflow problems on several implementations have been fixed.
 (Thanks to Zach Beane for pointing this out.)
 
+** improvements
+
+consing when computing the CRC32 checksum for gzip has been reduced.
+(Thanks to Zach Beane for permission to pull his code from Salza.)
+
 ** new features
 
 A new method on DECOMPRESS has been added for decompressing files into
