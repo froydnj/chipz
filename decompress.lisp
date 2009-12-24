@@ -61,8 +61,7 @@
                (return-from %decompress/null-vector (maybe-subseq output output-start))))))))
 
 (defmethod decompress ((output null) (state decompression-state) (input vector)
-                       &key (input-start 0) input-end buffer-size
-                       &allow-other-keys)
+                       &key (input-start 0) input-end buffer-size)
   (%decompress/null-vector state input
                            (decompress-fun-for-state state)
                            input-start (or input-end (length input))
@@ -103,7 +102,7 @@
                    (return-from %decompress/null-stream (maybe-subseq output output-start))))))))))
 
 (defmethod decompress ((output null) (state decompression-state) (input stream)
-                       &key buffer-size &allow-other-keys)
+                       &key buffer-size)
   (%decompress/null-stream state input
                            (decompress-fun-for-state state)
                            (or buffer-size +default-buffer-size+)))
@@ -132,7 +131,7 @@
 
 (defmethod decompress ((output vector) (state decompression-state) (input vector)
                        &key (input-start 0) input-end
-                       (output-start 0) output-end &allow-other-keys)
+                       (output-start 0) output-end)
   (%decompress/vector-vector output state input
                              (decompress-fun-for-state state)
                              input-start (or input-end (length input))
@@ -154,7 +153,7 @@
               (return-from %decompress/stream-vector output))))))
 
 (defmethod decompress ((output stream) (state decompression-state) (input vector)
-                       &key (input-start 0) input-end &allow-other-keys)
+                       &key (input-start 0) input-end)
   (%decompress/stream-vector output state input
                              (decompress-fun-for-state state)
                              input-start (or input-end (length input))))
@@ -184,6 +183,6 @@
                 (return-from %decompress/stream-stream output)))))))
 
 (defmethod decompress ((output stream) (state decompression-state) (input stream)
-                       &key &allow-other-keys)
+                       &key)
   (%decompress/stream-stream output state input
                              (decompress-fun-for-state state)))
