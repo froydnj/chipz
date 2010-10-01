@@ -4,9 +4,12 @@
 ;;;
 ;;; * decompress a buffer to a newly-consed buffer;
 ;;; * decompress a stream to a newly-consed buffer;
+;;; * decompress a pathane to a newly-consed buffer;
 ;;; * decompress a buffer to a user-specified buffer;
 ;;; * decompress a buffer to a stream;
 ;;; * decompress a stream to a stream.
+;;; * decompress a pathname to another pathname;
+;;; * decompress a pathname to a stream;
 ;;;
 ;;; We do not provide stream->buffer decompression, as we have no way of
 ;;; knowing how much to read from the stream to fill the buffer, no way
@@ -36,11 +39,29 @@
     (bzip2-state #'%bzip2-decompress)))
 
 ;; For convenience.
+(defun %decompress-from-pathname (output state pathname buffer-size)
+  (with-open-file (stream pathname :element-type '(unsigned-byte 8)
+                          :direction :input)
+    (decompress output state stream
+                :buffer-size (if (eq buffer-size :file-length)
+                                 (file-length stream)
+                                 buffer-size))))
+
 (defmethod decompress ((output null) (state decompression-state) (input pathname)
                        &key)
-  (with-open-file (stream input :element-type '(unsigned-byte 8)
-                          :direction :input)
-    (decompress output state stream :buffer-size (file-length stream))))
+  (%decompress-from-pathname output state input :file-length))
+
+(defmethod decompress ((output pathname) (state decompression-state) (input pathname)
+                       &key buffer-size)
+  (check-type buffer-size (or null integer))
+  (with-open-file (stream output :element-type '(unsigned-byte 8)
+                          :direction :output)
+    (%decompress-from-pathname stream state input buffer-size)))
+
+(defmethod decompress ((output stream) (state decompression-state) (input pathname)
+                       &key buffer-size)
+  (check-type buffer-size (or null integer))
+  (%decompress-from-pathname output state input buffer-size))
 
 (defun %decompress/null-vector (state input fun
                                 input-start input-end buffer-size)
