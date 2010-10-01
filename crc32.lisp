@@ -74,10 +74,13 @@
             (setf high (logxor (ash high -8) t-high))))))))
 
 (defun update-crc32 (state vector start end)
-  (setf (values (crc32-high state)
-                (crc32-low state))
-        (crc32 (crc32-high state) (crc32-low state)
-               vector start (- end start))))
+  ;; ABCL used to miscompile (SETF (VALUES (ACCESSOR ...) ...) ...)
+  ;; in case you were wondering why we take this route.
+  (multiple-value-bind (high low) (crc32 (crc32-high state) (crc32-low state)
+                                         vector start (- end start))
+    (setf (crc32-high state) high
+          (crc32-low state) low)
+    (values high low)))
 
 (defun produce-crc32 (state)
   (+ (ash (logxor (crc32-high state) #xFFFF) 16)
