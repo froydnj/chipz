@@ -1,5 +1,12 @@
 hey emacs, show me an -*- mode: outline -*-
 
+* Version
+
+** bug fixes
+
+Stack overflow problems on several implementations have been fixed.
+(Thanks to Zach Beane for pointing this out.)
+
 * Version 0.7.4, released 2009-10-26
 
 ** bug fixes
