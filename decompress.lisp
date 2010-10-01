@@ -36,7 +36,8 @@
     (bzip2-state #'%bzip2-decompress)))
 
 ;; For convenience.
-(defmethod decompress ((output null) (state decompression-state) (input pathname))
+(defmethod decompress ((output null) (state decompression-state) (input pathname)
+                       &key)
   (with-open-file (stream input :element-type '(unsigned-byte 8)
                           :direction :input)
     (decompress output state stream :buffer-size (file-length stream))))
