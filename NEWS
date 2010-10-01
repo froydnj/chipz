@@ -7,6 +7,11 @@ hey emacs, show me an -*- mode: outline -*-
 Stack overflow problems on several implementations have been fixed.
 (Thanks to Zach Beane for pointing this out.)
 
+** new features
+
+A new method on DECOMPRESS has been added for decompressing files into
+memory.
+
 * Version 0.7.4, released 2009-10-26
 
 ** bug fixes

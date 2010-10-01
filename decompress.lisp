@@ -35,6 +35,12 @@
     (inflate-state #'%inflate)
     (bzip2-state #'%bzip2-decompress)))
 
+;; For convenience.
+(defmethod decompress ((output null) (state decompression-state) (input pathname))
+  (with-open-file (stream input :element-type '(unsigned-byte 8)
+                          :direction :input)
+    (decompress output state stream :buffer-size (file-length stream))))
+
 (defun %decompress/null-vector (state input fun
                                 input-start input-end buffer-size)
   (declare (type function fun))
