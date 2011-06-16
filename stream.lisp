@@ -158,23 +158,23 @@
 
 (defun read-and-decompress-byte (stream)
   (flet ((maybe-done ()
-	   (when (output-available-p stream)
-	     (return-from read-and-decompress-byte
-	       (aref (output-buffer stream)
-		     (prog1 (output-buffer-index stream)
-		       (incf (output-buffer-index stream))))))))
+           (when (output-available-p stream)
+             (return-from read-and-decompress-byte
+               (aref (output-buffer stream)
+                     (prog1 (output-buffer-index stream)
+                       (incf (output-buffer-index stream))))))))
     ;; several input buffers may be used up before output is available
     ;; => read-byte should refill "something" while at all possible,
     ;; like read-sequence already does.
     (loop initially (maybe-done)
-	  do (refill-stream-output-buffer stream)
-	     (maybe-done)
-	     (unless (input-available-p stream)
-	       (refill-stream-input-buffer stream))
-	     ;; If we didn't refill, then we must be all done.
-	     (unless (input-available-p stream)
-	       (finish-dstate (dstate stream))
-	       (return :eof)))))
+          do (refill-stream-output-buffer stream)
+             (maybe-done)
+             (unless (input-available-p stream)
+               (refill-stream-input-buffer stream))
+             ;; If we didn't refill, then we must be all done.
+             (unless (input-available-p stream)
+               (finish-dstate (dstate stream))
+               (return :eof)))))
 
 (defun copy-existing-output (stream seq start end)
   (declare (type simple-octet-vector seq))
