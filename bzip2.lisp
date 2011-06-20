@@ -428,8 +428,10 @@
 
              (bzip2-block-crc32 (state)
                (declare (type bzip2-state state))
-               (let ((crc32 (ensure-and-read-bits 32 state)))
-                 (setf (bzip2-state-stored-block-crc state) crc32)
+               (let ((crc32-hi (ensure-and-read-bits 16 state))
+                     (crc32-lo (ensure-and-read-bits 16 state)))
+                 (setf (bzip2-state-stored-block-crc state)
+                       (logior (ash crc32-hi 16) crc32-lo))
                  (transition-to bzip2-block-randombit)))
 
              (bzip2-block-randombit (state)
