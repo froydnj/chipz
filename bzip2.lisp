@@ -428,8 +428,10 @@
 
              (bzip2-block-crc32 (state)
                (declare (type bzip2-state state))
-               (let ((crc32 (ensure-and-read-bits 32 state)))
-                 (setf (bzip2-state-stored-block-crc state) crc32)
+               (let ((crc32-hi (ensure-and-read-bits 16 state))
+                     (crc32-lo (ensure-and-read-bits 16 state)))
+                 (setf (bzip2-state-stored-block-crc state)
+                       (logior (ash crc32-hi 16) crc32-lo))
                  (transition-to bzip2-block-randombit)))
 
              (bzip2-block-randombit (state)
@@ -819,9 +821,12 @@
                       ((bzip2-state-block-randomized-p state)
                        (error 'bzip2-randomized-blocks-unimplemented))
                       (t
-                       (setf (bzip2-state-t-position state) (aref tt (bzip2-state-t-position state))
-                             (bzip2-state-k0 state) (logand #xff (bzip2-state-t-position state))
-                             (bzip2-state-t-position state) (ash (bzip2-state-t-position state) -8))
+                       ;; BZIP2-STATE-T-POSITION was sometimes set to
+                       ;; a value outside its declared domain. Now
+                       ;; TEMP is used to store this value instead.
+                       (let ((temp (aref tt (bzip2-state-t-position state))))
+                         (setf (bzip2-state-k0 state) (logand #xff temp)
+                               (bzip2-state-t-position state) (ash temp -8)))
                        (incf (bzip2-state-n-blocks-used state))))
                     ;; We're not 'returning' anything here, we're just
                     ;; forcing this call to be in tail position.
