@@ -178,7 +178,7 @@
 
 (defun copy-existing-output (stream seq start end)
   (declare (type simple-octet-vector seq))
-  (let ((amount (min (- start end)
+  (let ((amount (min (- end start)
                      (- (output-buffer-n-bytes stream)
                         (output-buffer-index stream)))))
     (replace seq (output-buffer stream)
