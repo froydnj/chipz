@@ -46,4 +46,7 @@
                (:file "decompress" :depends-on ("inflate-state"
                                                 "inflate" "bzip2"))
                #+chipz-system:gray-streams
-               (:file "stream" :depends-on ("inflate-state" "inflate"))))
+               (:file "stream" :depends-on ("inflate-state" "inflate"))
+
+               #-chipz-system:gray-streams
+               (:file "stream-fallback" :depends-on ("package"))))
