@@ -77,7 +77,7 @@
                               :end2 output-index)))))))
 
 #+chipz-system:gray-streams
-(defun gzip-test/gray-stream (compressed-pathname original-pathname)
+(defun gzip-test/gray-stream-read-sequence (compressed-pathname original-pathname)
   (with-open-file (compressed-stream compressed-pathname :direction :input
                                      :element-type '(unsigned-byte 8))
     (with-open-file (stream original-pathname :direction :input
@@ -91,10 +91,28 @@
         (read-sequence original stream)
         (not (mismatch output original))))))
 
+#+chipz-system:gray-streams
+(defun gzip-test/gray-stream-read-byte (compressed-pathname original-pathname)
+  (with-open-file (compressed-stream compressed-pathname :direction :input
+                                     :element-type '(unsigned-byte 8))
+    (with-open-file (stream original-pathname :direction :input
+                            :element-type '(unsigned-byte 8))
+      (let ((zstream (make-decompressing-stream :gzip compressed-stream))
+            (output (make-array (file-length stream)
+                                :element-type '(unsigned-byte 8)))
+            (original (make-array (file-length stream)
+                                  :element-type '(unsigned-byte 8))))
+        (loop for i from 0 below (file-length stream) do
+          (progn
+            (setf (aref output i) (read-byte zstream))
+            (setf (aref original i) (read-byte stream))))
+        (not (mismatch output original))))))
+
 (defun run-all-tests (source-directory)
   (dolist (testfun (list #'gzip-test/whole-file
                          #'gzip-test/whole-file-cons
-                         #+chipz-system:gray-streams #'gzip-test/gray-stream
+                         #+chipz-system:gray-streams #'gzip-test/gray-stream-read-sequence
+                         #+chipz-system:gray-streams #'gzip-test/gray-stream-read-byte
                          #'gzip-test/incremental-file) t)
     (let ((directory (merge-pathnames (make-pathname :name :wild :type "lisp"
                                                      :directory '(:relative "test-files"))
