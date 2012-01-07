@@ -15,8 +15,7 @@
         (let ((compressed-bytes (read-sequence compressed-input compressed-stream)))
           (read-sequence original stream)
           (multiple-value-bind (bytes-read bytes-output)
-              (read-uncompressed-data zstream compressed-input output
-                                      :input-end compressed-bytes)
+              (decompress output zstream compressed-input :input-end compressed-bytes)
             (and (= bytes-read compressed-bytes)
                  (= bytes-output (length original))
                  (not (mismatch output original :end1 bytes-output
@@ -31,8 +30,8 @@
                                           :element-type '(unsigned-byte 8)))
             (original (make-array (file-length stream)
                                   :element-type '(unsigned-byte 8))))
-        (let ((compressed-bytes (read-sequence compressed-input compressed-stream))
-              (output (decompress :gzip compressed-input :input-end compressed-bytes)))
+        (let* ((compressed-bytes (read-sequence compressed-input compressed-stream))
+               (output (decompress nil :gzip compressed-input :input-end compressed-bytes)))
           (read-sequence original stream)
           (and (= (length original) (length output))
                (not (mismatch output original))))))))
@@ -55,11 +54,11 @@
               (output-index 0))
           (loop
              (multiple-value-bind (bytes-read bytes-output)
-                 (read-uncompressed-data zstream compressed-input output
-                                         :input-start input-index
-                                         :input-end compressed-bytes
-                                         :output-start output-index
-                                         :output-end (1+ output-index))
+                 (decompress output zstream compressed-input
+                             :input-start input-index
+                             :input-end compressed-bytes
+                             :output-start output-index
+                             :output-end (1+ output-index))
                (when (zerop bytes-output) (return))
                (let ((ouch (mismatch original output
                                      :start1 output-index :start2 output-index
