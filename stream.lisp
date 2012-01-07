@@ -2,6 +2,9 @@
 
 (in-package :chipz)
 
+(eval-when (:compile-toplevel :load-toplevel)
+  #-chipz-system:gray-streams
+  (error "gray streams are not supported in this lisp implementation"))
 
 ;;; portability definitions
 
@@ -16,79 +19,46 @@
     (require "streamc.fasl")))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
-(defvar *binary-input-stream-class*
-  (quote
-   #+lispworks stream:fundamental-binary-input-stream
-   #+sbcl sb-gray:fundamental-binary-input-stream
-   #+openmcl gray:fundamental-binary-input-stream
-   #+cmu ext:fundamental-binary-input-stream
-   #+allegro excl:fundamental-binary-input-stream
-   #-(or lispworks sbcl openmcl cmu allegro)
-   (error "octet streams not supported in this implementation")))
+  (defvar *binary-input-stream-class*
+     #+lispworks 'stream:fundamental-binary-input-stream
+     #+sbcl 'sb-gray:fundamental-binary-input-stream
+     #+openmcl 'gray:fundamental-binary-input-stream
+     #+cmu 'ext:fundamental-binary-input-stream
+     #+allegro 'excl:fundamental-binary-input-stream)
 
-(defvar *stream-read-byte-function*
-  (quote
-   #+lispworks stream:stream-read-byte
-   #+sbcl sb-gray:stream-read-byte
-   #+openmcl gray:stream-read-byte
-   #+cmu ext:stream-read-byte
-   #+allegro excl:stream-read-byte
-   #-(or lispworks sbcl openmcl cmu allegro)
-   (error "octet streams not supported in this implementation")))
+  (defvar *stream-read-byte-function*
+     #+lispworks 'stream:stream-read-byte
+     #+sbcl 'sb-gray:stream-read-byte
+     #+openmcl 'gray:stream-read-byte
+     #+cmu 'ext:stream-read-byte
+     #+allegro 'excl:stream-read-byte)
 
-(defvar *stream-read-sequence-function*
-  (quote
-   #+lispworks stream:stream-read-sequence
-   #+sbcl sb-gray:stream-read-sequence
-   #+openmcl ccl:stream-read-vector
-   #+cmu ext:stream-read-sequence
-   #+allegro excl:stream-read-sequence
-   #-(or lispworks sbcl openmcl cmu allegro)
-   (error "octet streams not supported in this implementation")))
+  (defvar *stream-read-sequence-function*
+     #+lispworks 'stream:stream-read-sequence
+     #+sbcl 'sb-gray:stream-read-sequence
+     #+openmcl 'ccl:stream-read-vector
+     #+cmu 'ext:stream-read-sequence
+     #+allegro 'excl:stream-read-sequence)
 ) ; EVAL-WHEN
 
 ;;; READ-SEQUENCE
 
 (defmacro define-stream-read-sequence (specializer &body body)
-  #+sbcl
-  `(defmethod sb-gray:stream-read-sequence ((stream ,specializer) seq &optional (start 0) end)
-     (cond
-       ((not (typep seq 'simple-octet-vector))
-        (call-next-method))
-       (t
-        (let ((end (or end (length seq))))
-          ,@body))))
-  #+cmu
-  `(defmethod ext:stream-read-sequence ((stream ,specializer) seq &optional (start 0) end)
-     (cond
-       ((not (typep seq 'simple-octet-vector))
-        (call-next-method))
-       (t
-        (let ((end (or end (length seq))))
-          ,@body))))
-  #+allegro
-  `(defmethod excl:stream-read-sequence ((stream ,specializer) seq &optional (start 0) end)
-     (cond
-       ((not (typep seq 'simple-octet-vector))
-        (call-next-method))
-       (t
-        (let ((end (or end (length seq))))
-          ,@body))))
-  #+openmcl
-  `(defmethod ccl:stream-read-vector ((stream ,specializer) seq start end)
-     (cond
-       ((not (typep seq 'simple-octet-vector))
-        (call-next-method))
-       (t
-        ,@body)))
-  #+lispworks
-  `(defmethod stream:stream-read-sequence ((stream ,specializer) seq start end)
-     (cond
-       ((not (typep seq 'simple-octet-vector))
-        (call-next-method))
-       (t
-        ,@body))))
+  (let ((definition
+          `(cond
+             ((not (typep seq 'simple-octet-vector))
+                (call-next-method))
+              (t
+                (let ((end (or end (length seq))))
+                  ,@body)))))
 
+    #+(or cmu sbcl allegro)
+    `(defmethod #.*stream-read-sequence-function* ((stream ,specializer) seq &optional (start 0) end)
+       ,definition)
+
+    #+(or lispworks openmcl)
+    `(defmethod #.*stream-read-sequence-function* ((stream ,specializer) seq start end)
+       ,definition)))
 
 ;;; class definition
 

@@ -73,7 +73,7 @@
                (not (mismatch output original :end1 output-index
                               :end2 output-index)))))))
 
-#+sbcl
+#+chipz-system:gray-streams
 (defun gzip-test/gray-stream (compressed-pathname original-pathname)
   (with-open-file (compressed-stream compressed-pathname :direction :input
                                      :element-type '(unsigned-byte 8))
@@ -91,7 +91,7 @@
 (defun run-all-tests (source-directory)
   (dolist (testfun (list #'gzip-test/whole-file
                          #'gzip-test/whole-file-cons
-                         #+sbcl #'gzip-test/gray-stream
+                         #+chipz-system:gray-streams #'gzip-test/gray-stream
                          #'gzip-test/incremental-file) t)
     (let ((directory (merge-pathnames (make-pathname :name :wild :type "lisp"
                                                      :directory '(:relative "test-files"))
