@@ -1,4 +1,8 @@
-(in-package :lizard)
+(defpackage :chipz-tests
+  (:use :cl :chipz)
+  (:export #:run-all-tests))
+
+(in-package :chipz-tests)
 
 (defun gzip-test/whole-file (compressed-pathname original-pathname)
   (with-open-file (compressed-stream compressed-pathname :direction :input
