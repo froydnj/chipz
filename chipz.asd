@@ -11,7 +11,7 @@
 (defmethod source-file-type ((c css-file) (s module)) "css")
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  #+(or sbcl lispworks openmcl cmu allegro)
+  #+(or sbcl lispworks openmcl cmu allegro clisp)
   (pushnew 'chipz-system:gray-streams cl:*features*))
 
 (asdf:defsystem :chipz
