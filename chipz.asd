@@ -1,6 +1,7 @@
 ; -*- mode: lisp -*-
 (cl:defpackage :chipz-system
-  (:use :cl :asdf))
+  (:use :cl :asdf)
+  (:export #:gray-streams))
 (cl:in-package :chipz-system)
 
 (defclass txt-file (doc-file) ())
@@ -8,6 +9,10 @@
 
 (defmethod source-file-type ((c txt-file) (s module)) "txt")
 (defmethod source-file-type ((c css-file) (s module)) "css")
+
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  #+(or sbcl lispworks openmcl cmu allegro clisp)
+  (pushnew 'chipz-system:gray-streams cl:*features*))
 
 (asdf:defsystem :chipz
   :version "0.7.4"
@@ -40,5 +45,8 @@
                (:file "bzip2" :depends-on ("dstate" "constants"))
                (:file "decompress" :depends-on ("inflate-state"
                                                 "inflate" "bzip2"))
-               #+(or sbcl lispworks openmcl cmu allegro)
-               (:file "stream" :depends-on ("inflate-state" "inflate"))))
+               #+chipz-system:gray-streams
+               (:file "stream" :depends-on ("inflate-state" "inflate"))
+
+               #-chipz-system:gray-streams
+               (:file "stream-fallback" :depends-on ("package"))))
