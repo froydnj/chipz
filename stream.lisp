@@ -165,6 +165,7 @@
              :start1 start :end1 end
              :start2 (output-buffer-index stream)
              :end2 (output-buffer-n-bytes stream))
+    (incf (output-buffer-index stream) amount)
     (+ start amount)))
 
 (define-stream-read-sequence decompressing-stream
