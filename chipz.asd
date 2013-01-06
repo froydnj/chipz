@@ -4,11 +4,8 @@
   (:export #:gray-streams))
 (cl:in-package :chipz-system)
 
-(defclass txt-file (doc-file) ())
-(defclass css-file (doc-file) ())
-
-(defmethod source-file-type ((c txt-file) (s module)) "txt")
-(defmethod source-file-type ((c css-file) (s module)) "css")
+(defclass txt-file (doc-file) ((type :initform "txt")))
+(defclass css-file (doc-file) ((type :initform "css")))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   #+(or sbcl lispworks openmcl cmu allegro clisp)
@@ -26,8 +23,7 @@
                (:file "package")
                (:module "doc"
                         :components
-                        ((:html-file "chipz")
-                         ;; XXX ASDF bogosity
+                        ((:html-file "index")
                          (:txt-file "chipz-doc")
                          (:css-file "style")))
                (:file "constants" :depends-on ("package"))
