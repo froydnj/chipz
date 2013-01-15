@@ -1,21 +1,35 @@
 hey emacs, show me an -*- mode: outline -*-
 
-* Version
+* Version 0.8, released 2013-01-14
 
 ** bug fixes
 
 Stack overflow problems on several implementations have been fixed.
 (Thanks to Zach Beane for pointing this out.)
 
+Anton Kovalenko contributed several fixes to the bzip2 code.
+
+Several bugs have been fixed with the Gray streams support.  (Thanks to
+Anton Kovalenko and Felix Lange for the fixes and zort on Github for a
+bug report.)
+
+Gray streams support works with recent versions of Allegro Common Lisp.
+(Thanks to Dave Cooper.)
+
 ** improvements
 
-consing when computing the CRC32 checksum for gzip has been reduced.
+Consing when computing the CRC32 checksum for gzip has been reduced.
 (Thanks to Zach Beane for permission to pull his code from Salza.)
+
+MAKE-DECOMPRESSING-STREAM now singals an error if Gray streams are not
+supported.  (Thanks to Felix Lange.)
 
 ** new features
 
 A new method on DECOMPRESS has been added for decompressing files into
 memory.
+
+CLISP now supports decompressing streams.  (Thanks to Felix Lange.)
 
 * Version 0.7.4, released 2009-10-26
 

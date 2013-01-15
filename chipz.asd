@@ -12,7 +12,7 @@
   (pushnew 'chipz-system:gray-streams cl:*features*))
 
 (asdf:defsystem :chipz
-  :version "0.7.4"
+  :version "0.8"
   :author "Nathan Froyd <froydnj@gmail.com>"
   :maintainer "Nathan Froyd <froydnj@gmail.com>"
   :description "A library for decompressing deflate, zlib, and gzip data"
