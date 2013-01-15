@@ -15,7 +15,7 @@
 ;;; TRIVIAL-GRAY-STREAMS has it, we might as well, too...
 #+allegro
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  (unless (fboundp 'stream:stream-write-string)
+  (unless (fboundp 'excl:stream-write-string)
     (require "streamc.fasl")))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
