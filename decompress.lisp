@@ -19,7 +19,12 @@
 
 (defgeneric decompress (output state input &key &allow-other-keys)
   (:method (output format input &rest keys)
-    (%decompress output format input keys)))
+    (%decompress output format input keys))
+  ;; Accommodate people who want to use lists as input, possibly for
+  ;; experimenting with the API.
+  (:method (output format (input list) &rest keys)
+    (let ((vector (coerce input '(simple-array (unsigned-byte 8) (*)))))
+      (%decompress output format vector keys))))
 
 (defun %decompress (output format input keys)
   (let ((state (make-dstate format)))
