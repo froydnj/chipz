@@ -4,7 +4,7 @@
 ;;;
 ;;; * decompress a buffer to a newly-consed buffer;
 ;;; * decompress a stream to a newly-consed buffer;
-;;; * decompress a pathane to a newly-consed buffer;
+;;; * decompress a pathname to a newly-consed buffer;
 ;;; * decompress a buffer to a user-specified buffer;
 ;;; * decompress a buffer to a stream;
 ;;; * decompress a stream to a stream.
