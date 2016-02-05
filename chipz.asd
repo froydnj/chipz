@@ -8,7 +8,7 @@
 (defclass css-file (doc-file) ((type :initform "css")))
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  #+(or sbcl lispworks openmcl cmu allegro clisp)
+  #+(or sbcl lispworks openmcl cmu allegro clisp ecl)
   (pushnew 'chipz-system:gray-streams cl:*features*))
 
 (asdf:defsystem :chipz

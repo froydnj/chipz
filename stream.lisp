@@ -8,6 +8,10 @@
 
 ;;; portability definitions
 
+#+ecl
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (gray::redefine-cl-functions))
+
 #+cmu
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (require :gray-streams))
@@ -25,7 +29,8 @@
      #+openmcl 'gray:fundamental-binary-input-stream
      #+cmu 'ext:fundamental-binary-input-stream
      #+allegro 'excl:fundamental-binary-input-stream
-     #+clisp 'gray:fundamental-binary-input-stream)
+     #+clisp 'gray:fundamental-binary-input-stream
+     #+ecl 'gray:fundamental-binary-input-stream)
 
   (defvar *stream-read-byte-function*
      #+lispworks 'stream:stream-read-byte
@@ -33,7 +38,8 @@
      #+openmcl 'gray:stream-read-byte
      #+cmu 'ext:stream-read-byte
      #+allegro 'excl:stream-read-byte
-     #+clisp 'gray:stream-read-byte)
+     #+clisp 'gray:stream-read-byte
+     #+ecl 'gray:stream-read-byte)
 
   (defvar *stream-read-sequence-function*
      #+lispworks 'stream:stream-read-sequence
@@ -41,7 +47,8 @@
      #+openmcl 'ccl:stream-read-vector
      #+cmu 'ext:stream-read-sequence
      #+allegro 'excl:stream-read-sequence
-     #+clisp 'gray:stream-read-byte-sequence)
+     #+clisp 'gray:stream-read-byte-sequence
+     #+ecl 'gray:stream-read-sequence)
 ) ; EVAL-WHEN
 
 ;;; READ-SEQUENCE
@@ -55,7 +62,7 @@
                 (let ((end (or end (length seq))))
                   ,@body)))))
 
-    #+(or cmu sbcl allegro)
+    #+(or cmu sbcl allegro ecl)
     `(defmethod #.*stream-read-sequence-function* ((stream ,specializer) seq &optional (start 0) end)
        ,definition)
 

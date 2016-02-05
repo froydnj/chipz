@@ -197,8 +197,11 @@
     executable args :output output-file :if-output-exists :supersede)
   #+clisp
   (ext:run-program
-    executable :arguments args :output output-file :if-output-exists :overwrite)
-  #-(or lispworks sbcl openmcl cmu clisp)
+   executable :arguments args :output output-file :if-output-exists :overwrite)
+  #+ecl
+  (ext:run-program
+   executable args :output output-file :if-output-exists :supersede)
+  #-(or lispworks sbcl openmcl cmu clisp ecl)
   (error "run-external is not supported for this lisp implementation"))
 
 (defun compress-test-files (&optional (test-files-dir *default-test-files-dir*))
