@@ -424,12 +424,22 @@
                  (unless (= byte #x59)
                    (error 'invalid-bzip2-data))
                  (incf (bzip2-state-current-block-number state))
-                 (transition-to bzip2-block-crc32)))
+                 (transition-to bzip2-block-crc32-1)))
 
-             (bzip2-block-crc32 (state)
+             (bzip2-block-crc32-1 (state)
                (declare (type bzip2-state state))
-               (let ((crc32-hi (ensure-and-read-bits 16 state))
+               ;; store first part of CRC32
+               ;; (the 2 states should be split to avoid bug when
+               ;; the state machine is restarted between reads of the hi & lo parts)
+               (setf (bzip2-state-stored-block-crc state)
+                     (ensure-and-read-bits 16 state))
+               (transition-to bzip2-block-crc32-2))
+
+             (bzip2-block-crc32-2 (state)
+               (declare (type bzip2-state state))
+               (let ((crc32-hi (bzip2-state-stored-block-crc state))
                      (crc32-lo (ensure-and-read-bits 16 state)))
+                 ;; combine first and second part of CRC32
                  (setf (bzip2-state-stored-block-crc state)
                        (logior (ash crc32-hi 16) crc32-lo))
                  (transition-to bzip2-block-randombit)))
